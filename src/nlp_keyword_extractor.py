@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 DATA_DIRECTORY = "data"
-SEED_TERMS = [""]
+SEED_TERMS = ["meditation", "meditate"]
 
 class ModelBuilder:
     @staticmethod
@@ -40,7 +40,7 @@ class KeywordExtractor:
             use_mmr=True,
             use_maxsum=True,
             diversity=0.5,
-            top_n=4,
+            top_n=5,
             seed_keywords=SEED_TERMS,
         )
 

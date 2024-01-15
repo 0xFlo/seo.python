@@ -11,7 +11,7 @@ import os
 logging.basicConfig(level=logging.INFO)
 
 class PlaywrightFetcher:
-    def __init__(self, wait_time: int = 1000):
+    def __init__(self, wait_time: int = 1500):
         self.wait_time = wait_time
 
     def fetch_html(self, url: str) -> str:
@@ -51,6 +51,8 @@ class ContentScraper:
         except Exception as e:
             logging.error(f"Error in save_content: {e}", exc_info=True)
 
+    def file_exists(self, file_path: str) -> bool:
+        return os.path.exists(file_path)
             
 def main(use_playwright: bool = False):
     config_path = "src/settings.cfg"
@@ -63,10 +65,14 @@ def main(use_playwright: bool = False):
             urls = [url.strip() for url in file]
 
         for url in urls:
+            file_path = f"data/content_{url.split('//')[-1].replace('/', '_')}.xml"
+            if os.path.exists(file_path):  # Check if file already exists
+                logging.info(f"File already exists, skipping: {file_path}")
+                continue  # Skip to the next URL
+
             try:
                 content = scraper.scrape_content(url)
                 if content:
-                    file_path = f"data/content_{url.split('//')[-1].replace('/', '_')}.xml"
                     scraper.save_content(content, file_path)
                     logging.info(f"Content saved to {file_path}")
                 else:
@@ -75,6 +81,7 @@ def main(use_playwright: bool = False):
                 logging.error(f"Error processing URL {url}: {e}", exc_info=True)
     except Exception as e:
         logging.error(f"Error in main: {e}", exc_info=True)
+
 
 
 if __name__ == "__main__":
