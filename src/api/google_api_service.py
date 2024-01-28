@@ -21,6 +21,7 @@ class GoogleAPIService:
         except Exception as e:
             logging.error("API request error: %s", e, exc_info=True)
             return []
+        
 
     def sort_sites(self, sites):
         return sorted(sites, key=lambda site: (not site["siteUrl"].startswith("sc-domain:"), site["siteUrl"].lower()))

@@ -1,4 +1,4 @@
-#src/api/GoogleOauth2.py
+# src/api/GoogleOauth2.py
 import os
 import logging
 from google.oauth2 import credentials as oauth_credentials
@@ -23,28 +23,38 @@ class OAuthCredentialManager:
         credentials = self._load_from_file()
         if not credentials or not credentials.valid:
             credentials = self._refresh_if_expired(credentials) or self._get_new_credentials()
+            if credentials:
+                self.save_to_file(credentials)  # Save the new credentials
         return credentials
 
     def _load_from_file(self):
         try:
             return oauth_credentials.Credentials.from_authorized_user_file(self.token_file_path, self.scopes)
-        except (GoogleAuthError, OSError) as e:
+        except (GoogleAuthError, FileNotFoundError, IOError) as e:
             logging.error(f"Error loading credentials: {e}")
             return None
 
     def _refresh_if_expired(self, credentials):
-        if credentials and credentials.expired and credentials.refresh_token:
+        if not credentials:
+            logging.warning("Credentials are missing. Obtaining new credentials.")
+            return self._get_new_credentials()
+        
+        if credentials.expired and credentials.refresh_token:
             try:
                 credentials.refresh(Request())
                 return credentials
             except RefreshError as e:
                 logging.error(f"Error refreshing credentials: {e}")
+        
         return None
 
     def _get_new_credentials(self):
         try:
-            flow = InstalledAppFlow.from_client_secrets_file(self.token_file_path, self.scopes)
-            return flow.run_local_server(port=0)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                GoogleAuthConfig.CLIENT_SECRET_FILE_PATH, self.scopes)
+            credentials = flow.run_local_server(port=0)
+            self.save_to_file(credentials)
+            return credentials
         except GoogleAuthError as e:
             logging.error(f"Error obtaining new credentials: {e}")
             return None
@@ -62,7 +72,13 @@ def google_api_authentication():
     credential_manager = OAuthCredentialManager(auth_config.TOKEN_FILE_PATH, auth_config.READONLY_SCOPES)
 
     credentials = credential_manager.get_credentials()
+    
     if credentials:
-        credential_manager.save_to_file(credentials)
-
+        print("Successfully obtained credentials.")
+    else:
+        print("Failed to obtain credentials.")
+    
     return credentials
+
+if __name__ == "__main__":
+    google_api_authentication()
