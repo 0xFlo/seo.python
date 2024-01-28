@@ -2,8 +2,8 @@
 name = "src"
 version = "0.1.0"
 description = "Your project description"
-authors = ["Your Name <your@email.com>"]
-
+authors = ["Florian Kluge"]
+license = "Apache-2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -17,5 +17,9 @@ keybert = "^0.8.3"
 keyphrase-vectorizers = "^0.0.11"
 validators = "^0.22.0"
 xmltodict = "^0.13.0"
+fastapi = "^0.109.0"
+google-api-python-client = "^2.115.0"
+google-auth-oauthlib = "^1.2.0"
+google-auth = "^2.27.0"
 
 [tool.poetry.dev-dependencies]
