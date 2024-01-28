@@ -127,3 +127,4 @@ dmypy.json
 #data folder
 data/*
 secrets/client_secrets.json
+secrets/tokens/token.json
